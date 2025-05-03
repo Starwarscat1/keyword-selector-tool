@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyword Selector Tool</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    textarea { width: 100%; min-height: 100px; resize: vertical; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    button { padding: 10px 15px; font-size: 1rem; border: none; border-radius: 4px; cursor: pointer; background: #007BFF; color: #fff; }
+    button:hover { background: #0056b3; }
+    .checkbox-section { display: flex; flex-direction: column; gap: 10px; }
+    .checkbox-controls { display: flex; gap: 10px; }
+    .checkbox-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ccc; }
+    @media (max-width: 600px) {
+      .checkbox-container { grid-template-columns: repeat(2, 1fr); }
+    }
+    .output-section { display: flex; flex-direction: column; gap: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Keyword Selector Tool</h1>
+  <div class="container">
+    <div class="input-section">
+      <textarea id="inputText" placeholder="Enter your text here..."></textarea>
+      <button id="clearBtn">Clear</button>
+    </div>
+    <div class="checkbox-section">
+      <div class="checkbox-controls">
+        <button id="selectAllBtn">Select All</button>
+        <button id="deselectAllBtn">Deselect All</button>
+      </div>
+      <div id="checkboxContainer" class="checkbox-container"></div>
+    </div>
+    <div class="output-section">
+      <textarea id="outputText" readonly placeholder="Selected keywords will appear here..."></textarea>
+      <button id="copyBtn">Copy</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    const inputText = document.getElementById('inputText');
+    const clearBtn = document.getElementById('clearBtn');
+    const checkboxContainer = document.getElementById('checkboxContainer');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const outputText = document.getElementById('outputText');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function parseWords(text){
+      return [...new Set(text.split(/\s+/).filter(w => w))];
+    }
+
+    function updateCheckboxes(){
+      const words = parseWords(inputText.value);
+      checkboxContainer.innerHTML = '';
+      words.forEach(word => {
+        const id = 'chk_' + word;
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = id;
+        checkbox.value = word;
+        checkbox.addEventListener('change', updateOutput);
+        const span = document.createElement('span');
+        span.textContent = word;
+        span.style.marginLeft = '5px';
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        checkboxContainer.appendChild(label);
+      });
+      updateOutput();
+    }
+
+    function updateOutput(){
+      const selected = Array.from(checkboxContainer.querySelectorAll('input[type="checkbox"]:checked'))
+        .map(chk => chk.value);
+      outputText.value = selected.map(w => '#' + w).join(' ');
+    }
+
+    inputText.addEventListener('input', updateCheckboxes);
+    clearBtn.addEventListener('click', () => { inputText.value = ''; updateCheckboxes(); });
+    selectAllBtn.addEventListener('click', () => {
+      checkboxContainer.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = true);
+      updateOutput();
+    });
+    deselectAllBtn.addEventListener('click', () => {
+      checkboxContainer.querySelectorAll('input[type="checkbox"]').forEach(chk => chk.checked = false);
+      updateOutput();
+    });
+    copyBtn.addEventListener('click', () => {
+      outputText.select();
+      document.execCommand('copy');
+    });
+
+    // initialize
+    updateCheckboxes();
+  })();
+  </script>
+</body>
+</html>
