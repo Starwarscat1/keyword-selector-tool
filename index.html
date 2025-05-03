@@ -5,19 +5,117 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keyword Selector Tool</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-    h1 { text-align: center; margin-bottom: 20px; }
-    .container { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-    textarea { width: 100%; min-height: 100px; resize: vertical; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 10px 15px; font-size: 1rem; border: none; border-radius: 4px; cursor: pointer; background: #007BFF; color: #fff; }
-    button:hover { background: #0056b3; }
-    .checkbox-section { display: flex; flex-direction: column; gap: 10px; }
-    .checkbox-controls { display: flex; gap: 10px; }
-    .checkbox-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: #fff; padding: 10px; border-radius: 4px; border: 1px solid #ccc; }
-    @media (max-width: 600px) {
-      .checkbox-container { grid-template-columns: repeat(2, 1fr); }
+    /* Import a clean, professional font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
     }
-    .output-section { display: flex; flex-direction: column; gap: 10px; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      padding: 10px;
+      font-size: 1rem;
+      font-family: 'Inter', Arial, sans-serif;
+      line-height: 1.5;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      font-family: 'Inter', Arial, sans-serif;
+      font-weight: 500;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #007BFF;
+      color: #fff;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .checkbox-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .checkbox-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .checkbox-container label {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .output-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* Notification styling */
+    .notification {
+      font-size: 0.9rem;
+      color: #28a745;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+      margin-top: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .checkbox-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
@@ -37,6 +135,7 @@
     <div class="output-section">
       <textarea id="outputText" readonly placeholder="Selected keywords will appear here..."></textarea>
       <button id="copyBtn">Copy</button>
+      <span id="copyNotification" class="notification"></span>
     </div>
   </div>
   <script>
@@ -48,6 +147,7 @@
     const deselectAllBtn = document.getElementById('deselectAllBtn');
     const outputText = document.getElementById('outputText');
     const copyBtn = document.getElementById('copyBtn');
+    const copyNotification = document.getElementById('copyNotification');
 
     function parseWords(text){
       return [...new Set(text.split(/\s+/).filter(w => w))];
@@ -59,8 +159,6 @@
       words.forEach(word => {
         const id = 'chk_' + word;
         const label = document.createElement('label');
-        label.style.display = 'flex';
-        label.style.alignItems = 'center';
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.id = id;
@@ -95,6 +193,9 @@
     copyBtn.addEventListener('click', () => {
       outputText.select();
       document.execCommand('copy');
+      copyNotification.textContent = 'Copied to clipboard!';
+      copyNotification.style.opacity = '1';
+      setTimeout(() => { copyNotification.style.opacity = '0'; }, 2000);
     });
 
     // initialize
